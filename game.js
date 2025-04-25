@@ -1,4 +1,4 @@
-let scene, camera, renderer, rider, bike, wheels = [];
+let scene, camera, renderer, rider, wheels = [];
 let checkpoints = [], killbricks = [], currentCheckpoint;
 let overlay;
 
@@ -9,31 +9,32 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function init() {
+  // Scene setup
   scene = new THREE.Scene();
   scene.background = new THREE.Color("#87ceeb");
 
+  // Camera
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.set(0, 5, 10);
 
+  // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  // Lights
   scene.add(new THREE.AmbientLight(0xffffff, 0.6));
   const dirLight = new THREE.DirectionalLight(0xffffff, 1);
   dirLight.position.set(10, 20, 10);
   scene.add(dirLight);
 
-  const ground = new THREE.Mesh(
-    new THREE.BoxGeometry(100, 1, 100),
-    new THREE.MeshStandardMaterial({ color: 0x228B22 })
-  );
-  ground.position.y = -0.5;
-  scene.add(ground);
-
+  // Build character + bike
   buildBikeAndRider();
-  buildCheckpointsAndKillbricks();
 
+  // Obstacles
+  buildObby();
+
+  // Events
   window.addEventListener('resize', onWindowResize);
   document.addEventListener('keydown', onKeyDown);
 }
@@ -41,12 +42,14 @@ function init() {
 function buildBikeAndRider() {
   const bikeGroup = new THREE.Group();
 
+  // Frame
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(2, 0.2, 0.5),
     new THREE.MeshStandardMaterial({ color: 0x000000 })
   );
   bikeGroup.add(frame);
 
+  // Wheels
   for (let i = -1; i <= 1; i += 2) {
     const wheel = new THREE.Mesh(
       new THREE.TorusGeometry(0.4, 0.1, 16, 100),
@@ -58,6 +61,7 @@ function buildBikeAndRider() {
     bikeGroup.add(wheel);
   }
 
+  // Seat post
   const post = new THREE.Mesh(
     new THREE.CylinderGeometry(0.05, 0.05, 0.8, 16),
     new THREE.MeshStandardMaterial({ color: 0x333333 })
@@ -65,6 +69,7 @@ function buildBikeAndRider() {
   post.position.set(0, 0.4, 0);
   bikeGroup.add(post);
 
+  // Rider - head
   const head = new THREE.Mesh(
     new THREE.SphereGeometry(0.3, 16, 16),
     new THREE.MeshStandardMaterial({ color: 0xffcc99 })
@@ -72,6 +77,7 @@ function buildBikeAndRider() {
   head.position.set(0, 1.5, 0);
   bikeGroup.add(head);
 
+  // Rider - body
   const body = new THREE.Mesh(
     new THREE.CylinderGeometry(0.2, 0.2, 0.8, 16),
     new THREE.MeshStandardMaterial({ color: 0x0000ff })
@@ -85,23 +91,42 @@ function buildBikeAndRider() {
   scene.add(rider);
 }
 
-function buildCheckpointsAndKillbricks() {
-  for (let i = 1; i <= 5; i++) {
-    const checkpoint = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.5, 0.5, 0.2, 32),
-      new THREE.MeshStandardMaterial({ color: 0x00ff00 })
-    );
-    checkpoint.position.set(i * 10, 0, 0);
-    scene.add(checkpoint);
-    checkpoints.push(checkpoint);
+function buildObby() {
+  const platformWidth = 5;
+  const platformHeight = 0.5;
+  const platformDepth = 5;
+  const gap = 2;
+  const numPlatforms = 10;
 
-    const killbrick = new THREE.Mesh(
-      new THREE.BoxGeometry(2, 0.5, 2),
-      new THREE.MeshStandardMaterial({ color: 0xff0000 })
+  for (let i = 0; i < numPlatforms; i++) {
+    const platform = new THREE.Mesh(
+      new THREE.BoxGeometry(platformWidth, platformHeight, platformDepth),
+      new THREE.MeshStandardMaterial({ color: 0x228B22 })
     );
-    killbrick.position.set(i * 10 + 5, 0.25, 0);
-    scene.add(killbrick);
-    killbricks.push(killbrick);
+    platform.position.set(i * (platformWidth + gap), -0.25, 0);
+    scene.add(platform);
+
+    // Add checkpoint every 3 platforms
+    if (i % 3 === 0) {
+      const checkpoint = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.5, 0.5, 0.2, 32),
+        new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+      );
+      checkpoint.position.set(i * (platformWidth + gap), 0, 0);
+      scene.add(checkpoint);
+      checkpoints.push(checkpoint);
+    }
+
+    // Add killbrick every 4 platforms
+    if (i % 4 === 0 && i !== 0) {
+      const killbrick = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 0.5, 2),
+        new THREE.MeshStandardMaterial({ color: 0xff0000 })
+      );
+      killbrick.position.set(i * (platformWidth + gap), 0.25, 0);
+      scene.add(killbrick);
+      killbricks.push(killbrick);
+    }
   }
 }
 
