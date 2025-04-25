@@ -15,7 +15,8 @@ function init() {
 
   // Camera
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 5, 10);
+  camera.position.set(0, 5, 10);  // Position the camera above and behind the bike
+  camera.lookAt(0, 1, 0); // Make the camera look at the center
 
   // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -89,6 +90,8 @@ function buildBikeAndRider() {
   currentCheckpoint = bikeGroup.position.clone();
   rider = bikeGroup;
   scene.add(rider);
+
+  console.log('Bike and rider built');
 }
 
 function buildObby() {
@@ -128,6 +131,8 @@ function buildObby() {
       killbricks.push(killbrick);
     }
   }
+
+  console.log('Obby built');
 }
 
 function onKeyDown(event) {
@@ -175,4 +180,5 @@ function animate() {
   requestAnimationFrame(animate);
   camera.lookAt(rider.position);
   renderer.render(scene, camera);
+  console.log('Rendering...');
 }
