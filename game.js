@@ -1,13 +1,17 @@
-let scene, camera, renderer, rider, bike, wheels = [], mixer;
+let scene, camera, renderer, rider, bike, wheels = [];
 let checkpoints = [], killbricks = [], currentCheckpoint;
-let overlay = document.getElementById('overlay');
-let titleScreen = document.getElementById('title-screen');
-let startButton = document.getElementById('start-button');
+let overlay, titleScreen, startButton;
 
-startButton.addEventListener('click', () => {
-  titleScreen.style.display = 'none';
-  init();
-  animate();
+window.addEventListener('DOMContentLoaded', () => {
+  overlay = document.getElementById('overlay');
+  titleScreen = document.getElementById('title-screen');
+  startButton = document.getElementById('start-button');
+
+  startButton.addEventListener('click', () => {
+    titleScreen.style.display = 'none';
+    init();
+    animate();
+  });
 });
 
 function init() {
