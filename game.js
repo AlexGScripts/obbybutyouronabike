@@ -1,40 +1,29 @@
 let scene, camera, renderer, rider, bike, wheels = [];
 let checkpoints = [], killbricks = [], currentCheckpoint;
-let overlay, titleScreen, startButton;
+let overlay;
 
 window.addEventListener('DOMContentLoaded', () => {
   overlay = document.getElementById('overlay');
-  titleScreen = document.getElementById('title-screen');
-  startButton = document.getElementById('start-button');
-
-  startButton.addEventListener('click', () => {
-    titleScreen.style.display = 'none';
-    init();
-    animate();
-  });
+  init();
+  animate();
 });
 
 function init() {
-  // Scene setup
   scene = new THREE.Scene();
   scene.background = new THREE.Color("#87ceeb");
 
-  // Camera
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.set(0, 5, 10);
 
-  // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // Lights
   scene.add(new THREE.AmbientLight(0xffffff, 0.6));
   const dirLight = new THREE.DirectionalLight(0xffffff, 1);
   dirLight.position.set(10, 20, 10);
   scene.add(dirLight);
 
-  // Ground
   const ground = new THREE.Mesh(
     new THREE.BoxGeometry(100, 1, 100),
     new THREE.MeshStandardMaterial({ color: 0x228B22 })
@@ -42,13 +31,9 @@ function init() {
   ground.position.y = -0.5;
   scene.add(ground);
 
-  // Build character + bike
   buildBikeAndRider();
-
-  // Obstacles
   buildCheckpointsAndKillbricks();
 
-  // Events
   window.addEventListener('resize', onWindowResize);
   document.addEventListener('keydown', onKeyDown);
 }
@@ -56,14 +41,12 @@ function init() {
 function buildBikeAndRider() {
   const bikeGroup = new THREE.Group();
 
-  // Frame
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(2, 0.2, 0.5),
     new THREE.MeshStandardMaterial({ color: 0x000000 })
   );
   bikeGroup.add(frame);
 
-  // Wheels
   for (let i = -1; i <= 1; i += 2) {
     const wheel = new THREE.Mesh(
       new THREE.TorusGeometry(0.4, 0.1, 16, 100),
@@ -75,7 +58,6 @@ function buildBikeAndRider() {
     bikeGroup.add(wheel);
   }
 
-  // Seat post
   const post = new THREE.Mesh(
     new THREE.CylinderGeometry(0.05, 0.05, 0.8, 16),
     new THREE.MeshStandardMaterial({ color: 0x333333 })
@@ -83,7 +65,6 @@ function buildBikeAndRider() {
   post.position.set(0, 0.4, 0);
   bikeGroup.add(post);
 
-  // Rider - head
   const head = new THREE.Mesh(
     new THREE.SphereGeometry(0.3, 16, 16),
     new THREE.MeshStandardMaterial({ color: 0xffcc99 })
@@ -91,7 +72,6 @@ function buildBikeAndRider() {
   head.position.set(0, 1.5, 0);
   bikeGroup.add(head);
 
-  // Rider - body
   const body = new THREE.Mesh(
     new THREE.CylinderGeometry(0.2, 0.2, 0.8, 16),
     new THREE.MeshStandardMaterial({ color: 0x0000ff })
